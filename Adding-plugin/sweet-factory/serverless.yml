@@ -1,4 +1,5 @@
 service: sweet-factory
+frameworkVersion: "3"
 
 provider:
   name: aws
@@ -12,3 +13,17 @@ functions:
 
 plugins:
   - serverless-esbuild
+  - serverless-step-functions
+
+stepFunctions:
+  stateMachines:
+    helloStateMachine:
+      name: MyHelloStateMachine
+      definition:
+        StartAt: HelloWorld
+        States:
+          HelloWorld:
+            Type: Task
+            Resource:
+              Fn::GetAtt: [hello, Arn]
+            End: true
