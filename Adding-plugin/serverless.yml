@@ -1,0 +1,14 @@
+service: sweet-factory
+
+provider:
+  name: aws
+  runtime: nodejs18.x
+  stage: dev
+  region: us-east-1
+
+functions:
+  hello:
+    handler: handlers/handler.hello
+
+plugins:
+  - serverless-esbuild
