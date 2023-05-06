@@ -27,3 +27,8 @@ stepFunctions:
             Resource:
               Fn::GetAtt: [hello, Arn]
             End: true
+
+custom:
+  esbuild:
+    bundle: true
+    exclude: []

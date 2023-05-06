@@ -10,7 +10,10 @@ provider:
 functions:
   hello:
     handler: handlers/handler.hello
-
+  ingredientPreparation:
+    handler: handlers/ingredientPreparation.handler
+    environment:
+      INVENTORY_TABLE: ${self:resources.Resources.InventoryTable.Properties.TableName}
 plugins:
   - serverless-esbuild
   - serverless-step-functions
@@ -42,3 +45,8 @@ resources:
         ProvisionedThroughput:
           ReadCapacityUnits: 1
           WriteCapacityUnits: 1
+
+custom:
+  esbuild:
+    bundle: true
+    exclude: []
