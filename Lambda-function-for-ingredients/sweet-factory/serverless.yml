@@ -6,15 +6,7 @@ provider:
   runtime: nodejs18.x
   stage: dev
   region: us-east-1
-  iam:
-    role:
-      statements:
-        - Effect: Allow
-          Action:
-            - dynamodb:GetItem
-            - dynamodb:PutItem
-          Resource:
-            - !GetAtt InventoryTable.Arn
+
 functions:
   hello:
     handler: handlers/handler.hello
