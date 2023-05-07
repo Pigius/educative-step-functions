@@ -52,17 +52,21 @@ export const handler = async (
     (item) => item !== null
   );
 
-  const statusCode = filteredInsufficientIngredients.length === 0 ? 200 : 400;
-  const body =
-    filteredInsufficientIngredients.length === 0
-      ? { status: "success" }
-      : {
-          status: "insufficient",
-          insufficientIngredients: filteredInsufficientIngredients,
-        };
-
-  return {
-    statusCode,
-    body: JSON.stringify(body),
-  };
+  if (filteredInsufficientIngredients.length === 0) {
+    return {
+      statusCode: 200,
+      body: JSON.stringify({
+        status: "success",
+        ingredients: requiredIngredients,
+      }),
+    };
+  } else {
+    return {
+      statusCode: 400,
+      body: JSON.stringify({
+        status: "insufficient",
+        insufficientIngredients: filteredInsufficientIngredients,
+      }),
+    };
+  }
 };
