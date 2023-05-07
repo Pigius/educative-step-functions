@@ -47,7 +47,7 @@ stepFunctions:
             Next: MixingIngredients
           MixingIngredients:
             Type: Map
-            InputPath: "$.body.ingredients" # Assuming the input is an object with an array of ingredients
+            InputPath: "$.body.ingredients"
             Iterator:
               StartAt: MixIngredient
               States:
