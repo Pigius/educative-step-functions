@@ -55,18 +55,18 @@ export const handler = async (
   if (filteredInsufficientIngredients.length === 0) {
     return {
       statusCode: 200,
-      body: JSON.stringify({
+      body: {
         status: "success",
         ingredients: requiredIngredients,
-      }),
+      },
     };
   } else {
     return {
       statusCode: 400,
-      body: JSON.stringify({
+      body: {
         status: "insufficient",
         insufficientIngredients: filteredInsufficientIngredients,
-      }),
+      },
     };
   }
 };

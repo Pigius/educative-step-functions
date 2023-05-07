@@ -47,7 +47,7 @@ stepFunctions:
             Next: MixingIngredients
           MixingIngredients:
             Type: Map
-            ItemsPath: "$.Payload.ingredients" # Assuming the input is an object with an array of ingredients
+            InputPath: "$.body.ingredients" # Assuming the input is an object with an array of ingredients
             Iterator:
               StartAt: MixIngredient
               States:
@@ -58,7 +58,7 @@ stepFunctions:
                   Next: WaitForMixing
                 WaitForMixing:
                   Type: Wait
-                  SecondsPath: "$.Payload.mixingTime"
+                  SecondsPath: "$.body.waitTime"
                   End: true
             End: true
 resources:
