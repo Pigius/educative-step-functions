@@ -1,11 +1,5 @@
 
 .DS_Store
-Adding-plugin/sweet-factory/node_modules/
-Adding-plugin/sweet-factory/.DS_Store
-Adding-plugin/sweet-factory/.serverless/
-After-DynamoDB/sweet-factory/.serverless/
-After-DynamoDB/sweet-factory/.DS_Store
-After-DynamoDB/sweet-factory/node_modules/
-Lambda-function-for-ingredients/sweet-factory/.serverless/
-Lambda-function-for-ingredients/sweet-factory/.DS_Store
-Lambda-function-for-ingredients/sweet-factory/node_modules/
+*/sweet-factory/.serverless/
+*/sweet-factory/.DS_Store
+*/sweet-factory/node_modules/
