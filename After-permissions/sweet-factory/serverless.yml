@@ -12,7 +12,7 @@ provider:
         - Effect: Allow
           Action:
             - dynamodb:GetItem
-            - dynamodb:PutItem
+            - dynamodb:UpdateItem
           Resource:
             - !GetAtt InventoryTable.Arn
 
