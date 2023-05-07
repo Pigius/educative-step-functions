@@ -22,7 +22,7 @@ functions:
     environment:
       INVENTORY_TABLE: ${self:resources.Resources.InventoryTable.Properties.TableName}
   mixIngredient:
-    handler: handlers/MixIngredient.handler
+    handler: handlers/mixIngredient.handler
 plugins:
   - serverless-esbuild
   - serverless-step-functions
