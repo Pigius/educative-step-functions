@@ -1,18 +1,19 @@
 import { APIGatewayProxyHandler } from "aws-lambda";
 import { DynamoDB } from "aws-sdk";
-import { faker } from "@faker-js/faker/locale/en_GB";
 
 const dynamoDb = new DynamoDB.DocumentClient();
 
 const tableName = process.env.DYNAMODB_TABLE;
 
 const createRecord: APIGatewayProxyHandler = async (event) => {
+  const data = JSON.parse(event.body || "{}");
+
   const params: DynamoDB.DocumentClient.PutItemInput = {
     TableName: tableName,
     Item: {
-      id: faker.datatype.uuid(),
-      name: faker.company.name(),
-      email: faker.internet.email(),
+      id: data.id,
+      name: data.name,
+      email: data.email,
     },
   };
 

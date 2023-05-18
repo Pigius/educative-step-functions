@@ -8,15 +8,18 @@ provider:
   region: us-east-1
 
 functions:
-  hello:
-    handler: handlers/handler.hello
-  CreateDynamoDBRecord:
-    handler: handlers/createDynamoDBRecord.handler
+  createRecord:
+    handler: handlers/createRecord.handler
     environment:
       INVENTORY_TABLE: ${self:resources.Resources.InventoryTable.Properties.TableName}
 plugins:
   - serverless-esbuild
   - serverless-step-functions
+
+custom:
+  esbuild:
+    bundle: true
+    exclude: []
 
 stepFunctions:
   stateMachines:
@@ -28,7 +31,7 @@ stepFunctions:
           CreateDynamoDBRecord:
             Type: Task
             Resource:
-              Fn::GetAtt: [createDynamoDBRecord, Arn]
+              Fn::GetAtt: [createRecord, Arn]
             End: true
 resources:
   Resources:
@@ -37,16 +40,11 @@ resources:
       Properties:
         TableName: ${self:service}-registration-${self:provider.stage}
         AttributeDefinitions:
-          - AttributeName: ingredient
+          - AttributeName: id
             AttributeType: S
         KeySchema:
-          - AttributeName: ingredient
+          - AttributeName: id
             KeyType: HASH
         ProvisionedThroughput:
           ReadCapacityUnits: 1
           WriteCapacityUnits: 1
-
-custom:
-  esbuild:
-    bundle: true
-    exclude: []
