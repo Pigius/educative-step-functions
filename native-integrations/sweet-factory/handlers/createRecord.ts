@@ -5,7 +5,7 @@ const dynamoDb = new DynamoDB.DocumentClient();
 
 const tableName = process.env.DYNAMODB_TABLE;
 
-const createRecord: APIGatewayProxyHandler = async (event) => {
+const handler: APIGatewayProxyHandler = async (event) => {
   const data = JSON.parse(event.body || "{}");
 
   const params: DynamoDB.DocumentClient.PutItemInput = {
@@ -36,4 +36,4 @@ const createRecord: APIGatewayProxyHandler = async (event) => {
   }
 };
 
-export { createRecord };
+export { handler };
