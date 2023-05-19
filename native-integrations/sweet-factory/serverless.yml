@@ -19,7 +19,7 @@ functions:
   createRecord:
     handler: handlers/createRecord.handler
     environment:
-      TABLE_NAME: ${self:resources.Resources.InventoryTable.Properties.TableName}
+      TABLE_NAME: ${self:resources.Resources.RegistrationTable.Properties.TableName}
 plugins:
   - serverless-esbuild
   - serverless-step-functions
