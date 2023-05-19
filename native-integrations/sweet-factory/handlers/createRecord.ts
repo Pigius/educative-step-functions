@@ -3,7 +3,7 @@ import { DynamoDB } from "aws-sdk";
 
 const dynamoDb = new DynamoDB.DocumentClient();
 
-const tableName = process.env.DYNAMODB_TABLE;
+const tableName = process.env.TABLE_NAME;
 
 const handler: APIGatewayProxyHandler = async (event) => {
   const data = JSON.parse(event.body || "{}");

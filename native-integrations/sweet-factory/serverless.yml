@@ -19,7 +19,7 @@ functions:
   createRecord:
     handler: handlers/createRecord.handler
     environment:
-      INVENTORY_TABLE: ${self:resources.Resources.InventoryTable.Properties.TableName}
+      TABLE_NAME: ${self:resources.Resources.InventoryTable.Properties.TableName}
 plugins:
   - serverless-esbuild
   - serverless-step-functions
@@ -43,7 +43,7 @@ stepFunctions:
             End: true
 resources:
   Resources:
-    InventoryTable:
+    RegistrationTable:
       Type: AWS::DynamoDB::Table
       Properties:
         TableName: ${self:service}-registration-${self:provider.stage}
