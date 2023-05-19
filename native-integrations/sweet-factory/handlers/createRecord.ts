@@ -6,7 +6,7 @@ const dynamoDb = new DynamoDB.DocumentClient();
 const tableName = process.env.TABLE_NAME;
 
 const handler: APIGatewayProxyHandler = async (event) => {
-  const data = JSON.parse(event.body || "{}");
+  const data = JSON.parse(event || "{}");
 
   const params: DynamoDB.DocumentClient.PutItemInput = {
     TableName: tableName,
