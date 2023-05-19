@@ -11,10 +11,9 @@ provider:
       statements:
         - Effect: Allow
           Action:
-            - dynamodb:GetItem
-            - dynamodb:UpdateItem
+            - dynamodb:PutItem
           Resource:
-            - !GetAtt InventoryTable.Arn
+            - !GetAtt RegistrationTable.Arn
 functions:
   createRecord:
     handler: handlers/createRecord.handler
