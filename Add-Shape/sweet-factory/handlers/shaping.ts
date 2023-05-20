@@ -1,8 +1,13 @@
-import { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
+import { APIGatewayProxyResult } from "aws-lambda";
 
-interface Sweet {
+interface SweetInput {
   ingredient: string;
   quantity: number;
+}
+
+interface SweetOutput extends SweetInput {
+  name: SweetName;
+  shape: SweetShape;
 }
 
 enum SweetShape {
@@ -11,26 +16,30 @@ enum SweetShape {
   Triangle = "Triangle",
 }
 
-interface ShapingRequest {
-  sweetBatch: Sweet[];
-  shape: SweetShape;
+enum SweetName {
+  SweetiePie = "Sweetie Pie",
+  LollyPop = "Lolly Pop",
+  GummyBear = "Gummy Bear",
+  JellyBean = "Jelly Bean",
+  CandyCane = "Candy Cane",
 }
 
 export const handler = async (
-  event: APIGatewayProxyEvent
+  event: SweetInput[]
 ): Promise<APIGatewayProxyResult> => {
-  const shapingRequest: ShapingRequest = JSON.parse(event.body);
-
   // Simulate shaping delay
   await new Promise((resolve) => setTimeout(resolve, 5000));
 
   // Shaping is assumed to always succeed
-  const shapedSweets = shapingRequest.sweetBatch.map((sweet) => ({
+  const shapedSweets: SweetOutput[] = event.map((sweet) => ({
     ...sweet,
     shape:
       Object.values(SweetShape)[
         Math.floor(Math.random() * Object.values(SweetShape).length)
       ],
+    name: Object.values(SweetName)[
+      Math.floor(Math.random() * Object.values(SweetName).length)
+    ],
   }));
 
   return {
