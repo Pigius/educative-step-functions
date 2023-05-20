@@ -5,9 +5,10 @@ interface SweetInput {
   quantity: number;
 }
 
-interface SweetOutput extends SweetInput {
+interface SweetOutput {
   name: SweetName;
   shape: SweetShape;
+  quantity: number;
 }
 
 enum SweetShape {
@@ -31,8 +32,7 @@ export const handler = async (
   await new Promise((resolve) => setTimeout(resolve, 5000));
 
   // Shaping is assumed to always succeed
-  const shapedSweets: SweetOutput[] = event.map((sweet) => ({
-    ...sweet,
+  const shapedSweets: SweetOutput[] = event.map((sweet: SweetInput) => ({
     shape:
       Object.values(SweetShape)[
         Math.floor(Math.random() * Object.values(SweetShape).length)
@@ -40,6 +40,7 @@ export const handler = async (
     name: Object.values(SweetName)[
       Math.floor(Math.random() * Object.values(SweetName).length)
     ],
+    quantity: sweet.quantity,
   }));
 
   return {
