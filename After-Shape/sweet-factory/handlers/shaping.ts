@@ -1,13 +1,15 @@
 import { APIGatewayProxyResult } from "aws-lambda";
+import { v4 as uuidv4 } from "uuid";
 
 interface SweetInput {
   ingredient: string;
   quantity: number;
 }
 
-interface SweetOutput extends SweetInput {
+interface SweetOutput {
   name: SweetName;
   shape: SweetShape;
+  quantity: number;
 }
 
 enum SweetShape {
@@ -30,9 +32,11 @@ export const handler = async (
   // Simulate shaping delay
   await new Promise((resolve) => setTimeout(resolve, 5000));
 
+  // Generate a UUID for the batch
+  const batchId = uuidv4();
+
   // Shaping is assumed to always succeed
-  const shapedSweets: SweetOutput[] = event.map((sweet) => ({
-    ...sweet,
+  const shapedSweets: SweetOutput[] = event.map((sweet: SweetInput) => ({
     shape:
       Object.values(SweetShape)[
         Math.floor(Math.random() * Object.values(SweetShape).length)
@@ -40,10 +44,15 @@ export const handler = async (
     name: Object.values(SweetName)[
       Math.floor(Math.random() * Object.values(SweetName).length)
     ],
+    quantity: sweet.quantity,
   }));
 
   return {
     statusCode: 200,
-    body: { status: "success", shapedSweets },
+    body: JSON.stringify({
+      status: "success",
+      batchId,
+      shapedSweets,
+    }),
   };
 };
