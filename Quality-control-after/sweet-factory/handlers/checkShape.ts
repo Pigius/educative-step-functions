@@ -2,9 +2,18 @@ import { APIGatewayProxyResult } from "aws-lambda";
 import { SecretsManager } from "aws-sdk";
 
 const secretsManager = new SecretsManager();
-
-interface Event {
+interface Sweet {
   shape: string;
+  name: string;
+  quantity: number;
+}
+interface Event {
+  statusCode: number;
+  body: {
+    status: string;
+    batchId: string;
+    shapedSweets: Sweet[];
+  };
 }
 
 export const handler = async (event: Event): Promise<APIGatewayProxyResult> => {
@@ -14,12 +23,23 @@ export const handler = async (event: Event): Promise<APIGatewayProxyResult> => {
       .getSecretValue({ SecretId: secretName })
       .promise();
     const secretValue: string[] = JSON.parse(data.SecretString);
+    const invalidShapes: Sweet[] = [];
 
-    if (!secretValue.includes(event.shape)) {
-      throw new Error("Invalid shape");
+    for (const sweet of event.body.shapedSweets) {
+      if (!secretValue.includes(sweet.shape)) {
+        invalidShapes.push(sweet);
+      }
     }
 
-    return { validShape: true };
+    if (invalidShapes.length > 0) {
+      throw new Error(
+        `Invalid shapes: ${invalidShapes
+          .map((sweet) => sweet.shape)
+          .join(", ")}`
+      );
+    }
+
+    return { validShapes: true };
   } catch (error) {
     console.error(error);
     throw error;

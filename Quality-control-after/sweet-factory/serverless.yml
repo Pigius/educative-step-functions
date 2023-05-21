@@ -15,7 +15,11 @@ provider:
             - dynamodb:UpdateItem
           Resource:
             - !GetAtt InventoryTable.Arn
-
+        - Effect: Allow
+          Action:
+            - "secretsmanager:GetSecretValue"
+          Resource:
+            - !Ref SweetShapesSecret
 functions:
   ingredientPreparation:
     handler: handlers/ingredientPreparation.handler
