@@ -15,7 +15,6 @@ provider:
             - dynamodb:UpdateItem
           Resource:
             - !GetAtt InventoryTable.Arn
-
 functions:
   ingredientPreparation:
     handler: handlers/ingredientPreparation.handler
@@ -34,6 +33,7 @@ stepFunctions:
   stateMachines:
     productionLineStateMachine:
       name: productionLineStateMachine
+      role: !GetAtt ProductionLineExecutionRole.Arn
       definition:
         StartAt: IngredientPreparation
         States:
@@ -83,7 +83,14 @@ stepFunctions:
                   - States.TaskFailed
                 IntervalSeconds: 10
                 MaxAttempts: 3
+            Next: GetSecretValue
+          GetSecretValue:
+            Type: Task
+            Resource: "arn:aws:states:::aws-sdk:secretsmanager:getSecretValue"
+            Parameters:
+              SecretId: ${self:service}-${self:provider.stage}-sweet-shapes
             End: true
+
 resources:
   Resources:
     SweetShapesSecret:
@@ -104,6 +111,47 @@ resources:
         ProvisionedThroughput:
           ReadCapacityUnits: 1
           WriteCapacityUnits: 1
+    ProductionLineExecutionRole:
+      Type: "AWS::IAM::Role"
+      Properties:
+        RoleName: ProductionLineExecutionRole
+        AssumeRolePolicyDocument:
+          Version: "2012-10-17"
+          Statement:
+            - Effect: Allow
+              Principal:
+                Service:
+                  - states.amazonaws.com
+              Action: "sts:AssumeRole"
+        Policies:
+          - PolicyName: "statesSecretsManagerAccess"
+            PolicyDocument:
+              Version: "2012-10-17"
+              Statement:
+                - Effect: Allow
+                  Action:
+                    - "secretsmanager:GetSecretValue"
+                  Resource:
+                    - !Ref SweetShapesSecret
+                - Effect: Allow
+                  Action:
+                    - "lambda:InvokeFunction"
+                  Resource:
+                    - Fn::Sub:
+                        - arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:${FunctionName}
+                        - FunctionName: ${self:service}-${self:provider.stage}-ingredientPreparation
+                    - Fn::Sub:
+                        - arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:${FunctionName}
+                        - FunctionName: ${self:service}-${self:provider.stage}-mixIngredient
+                    - Fn::Sub:
+                        - arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:${FunctionName}
+                        - FunctionName: ${self:service}-${self:provider.stage}-shaping
+                - Effect: Allow
+                  Action:
+                    - dynamodb:GetItem
+                    - dynamodb:UpdateItem
+                  Resource:
+                    - Fn::GetAtt: [InventoryTable, Arn]
 
 custom:
   esbuild:
