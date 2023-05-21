@@ -99,6 +99,7 @@ stepFunctions:
             Next: CheckShape
           CheckShape:
             Type: Task
+            ResultPath: "$.checkShape"
             Resource:
               Fn::GetAtt: [checkShape, Arn]
             Retry:
@@ -109,6 +110,7 @@ stepFunctions:
             Next: ApiQualityCheck
           ApiQualityCheck:
             Type: Task
+            ResultPath: "$.apiQualityCheck"
             Resource:
               Fn::GetAtt: [apiQualityCheck, Arn]
             Retry:
