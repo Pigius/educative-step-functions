@@ -1,0 +1,112 @@
+service: sweet-factory
+frameworkVersion: "3"
+
+provider:
+  name: aws
+  runtime: nodejs18.x
+  stage: dev
+  region: us-east-1
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action:
+            - dynamodb:GetItem
+            - dynamodb:UpdateItem
+          Resource:
+            - !GetAtt InventoryTable.Arn
+
+functions:
+  ingredientPreparation:
+    handler: handlers/ingredientPreparation.handler
+    environment:
+      INVENTORY_TABLE: ${self:resources.Resources.InventoryTable.Properties.TableName}
+  mixIngredient:
+    handler: handlers/mixIngredient.handler
+  shaping:
+    handler: handlers/shaping.handler
+
+plugins:
+  - serverless-esbuild
+  - serverless-step-functions
+
+stepFunctions:
+  stateMachines:
+    productionLineStateMachine:
+      name: productionLineStateMachine
+      definition:
+        StartAt: IngredientPreparation
+        States:
+          IngredientPreparation:
+            Type: Task
+            Resource:
+              Fn::GetAtt: [ingredientPreparation, Arn]
+            Retry:
+              - ErrorEquals:
+                  - States.TaskFailed
+                IntervalSeconds: 10
+                MaxAttempts: 3
+            Next: CheckIngredients
+          CheckIngredients:
+            Type: Choice
+            Choices:
+              - Variable: "$.statusCode"
+                NumericEquals: 200
+                Next: MixingIngredients
+            Default: InsufficientIngredients
+          InsufficientIngredients:
+            Type: Fail
+            Cause: "Insufficient ingredients to proceed with the mixing process."
+          MixingIngredients:
+            Type: Map
+            InputPath: "$.body.ingredients"
+            Iterator:
+              StartAt: MixIngredient
+              States:
+                MixIngredient:
+                  Type: Task
+                  ResultPath: "$.mixResult"
+                  Resource:
+                    Fn::GetAtt: [mixIngredient, Arn]
+                  Next: WaitForMixing
+                WaitForMixing:
+                  Type: Wait
+                  SecondsPath: "$.mixResult.body.waitTime"
+                  End: true
+            Next: Shaping
+          Shaping:
+            Type: Task
+            Resource:
+              Fn::GetAtt: [shaping, Arn]
+            Retry:
+              - ErrorEquals:
+                  - States.TaskFailed
+                IntervalSeconds: 10
+                MaxAttempts: 3
+            End: true
+resources:
+  Resources:
+    SweetShapesSecret:
+      Type: "AWS::SecretsManager::Secret"
+      Properties:
+        Name: ${self:service}-${self:provider.stage}-sweet-shapes
+        SecretString: ${self:custom.sweetShapes}
+    InventoryTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:service}-inventory-${self:provider.stage}
+        AttributeDefinitions:
+          - AttributeName: ingredient
+            AttributeType: S
+        KeySchema:
+          - AttributeName: ingredient
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+
+custom:
+  esbuild:
+    bundle: true
+    exclude: []
+  sweetShapes: '["Circle","Square","Triangle"]'
